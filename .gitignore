@@ -1,0 +1,16 @@
+# Datasets and Artifacts
+dataset/
+data/
+artifacts/
+*.set
+*.fdt
+*.npy
+
+# Python Virtual Environments
+venv/
+env/
+.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+__pycache__/
