@@ -9,5 +9,6 @@ requests>=2.31
 # PyTorch: install manually for your CUDA version from https://pytorch.org/get-started/locally/
 # e.g.: pip install torch --index-url https://download.pytorch.org/whl/cu128
 torch>=2.0
+pyriemann>=0.6          # T1-D: Riemannian tangent-space features
 # Optional: for remote dataset download via Google Drive
 # gdown>=5.0
