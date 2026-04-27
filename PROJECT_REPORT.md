@@ -289,12 +289,67 @@ The per-subject variance (std=0.207) is large enough that aggregate accuracy gai
 
 ---
 
-## 9. References
+## 9. Ethical, Environmental and Societal Implications
 
+### Individual impact
+
+A deployed EEG workload classifier operating in safety-critical settings — surgical suites, air traffic control, nuclear plant operation — carries asymmetric risks. A false negative (classifying an overloaded operator as Low/Medium workload) could lead to task assignment errors or missed intervention opportunities at precisely the moment the operator is most vulnerable. Continuous cognitive monitoring also raises autonomy and surveillance concerns: workers may feel coerced into passively consenting to physiological profiling, with limited ability to contest the system's judgements about their mental state. This is especially acute given the per-subject variance demonstrated here — 8/28 subjects remain near chance even for the best model, meaning the classifier may be systematically unreliable for specific individuals with no clear mechanism for those individuals to know.
+
+### Organisational and demographic impact
+
+Organisations deploying such a classifier inherit liability for its errors. If a workload-triggered intervention (e.g., task reallocation, mandatory break) is triggered by a misclassification, the downstream consequences — productivity loss, legal liability, workforce trust — fall on the employer. The per-subject variance found in this project is also suggestive of potential demographic disparities: if inter-individual EEG variability correlates with characteristics such as age, neurological baseline, or electrode-scalp contact variation by hair type, the classifier may perform systematically worse for certain groups, constituting a form of discriminatory outcome.
+
+### Environmental impact
+
+This model is small (~35–40K parameters, ~5 minutes training time on a single GPU), giving it a negligible direct carbon footprint. However, scaling continuous real-time EEG workload monitoring across an organisation requires embedded inference hardware running at low latency, 24 hours a day. Strubell et al. (2019) demonstrated that sustained neural network inference at scale can accumulate significant energy costs even when the per-inference compute is low. Edge deployment design should prioritise energy-efficient inference (quantised models, neuromorphic hardware) if the system is to scale sustainably.
+
+### Regulatory and societal context
+
+The EU AI Act (2024) explicitly classifies systems that infer psychological states from biometric data as high-risk AI systems, requiring conformity assessments, transparency obligations, and human oversight mechanisms before deployment. EEG-based workload classifiers would likely fall under this classification, and operators in EU member states would face significant compliance burdens. More broadly, Ienca & Andorno (2017) argue that continuous neural monitoring creates new categories of privacy risk — "cognitive liberty" and the "right to mental privacy" — that existing data protection frameworks were not designed to address. These concerns are not hypothetical: the COG-BCI dataset itself involves continuous EEG recording during active task performance, and the transition from research protocol to deployed product would require explicit ethical governance beyond standard research ethics approval.
+
+---
+
+## 10. Emerging Trends in EEG-Based Workload Classification
+
+### EEG Foundation Models
+
+The most significant recent development in EEG deep learning is the emergence of large-scale pretrained models. LaBraM (Jiang et al., 2024), trained on over 2,500 hours of diverse EEG data via masked token reconstruction, achieved 85.83% balanced accuracy on the EEGMAT workload classification benchmark — compared to 73.89% for the best from-scratch supervised model in the same evaluation. BENDR (Kostas et al., 2021) demonstrated that self-supervised pretraining on large EEG corpora learns general neural representations that transfer effectively to downstream classification tasks with limited labelled data. Applied to the cross-session problem studied here, fine-tuning a pretrained LaBraM backbone instead of training the CNN-LSTM from scratch would address the fundamental data scarcity issue: the ~5,600 training windows available per model are inadequate for learning session-invariant representations from scratch, but are sufficient for fine-tuning a backbone that has already learned general EEG structure. This is likely to become the standard approach for EEG BCI systems within the next 2–3 years.
+
+### Test-Time Adaptation (TTA)
+
+Pérez-García et al. (2024) demonstrated that simple test-time adaptation techniques — specifically Adaptive Batch Normalisation (AdaBN) combined with entropy minimisation applied at inference — achieve state-of-the-art cross-subject EEG motor imagery decoding without any labelled calibration data from the test subject. This directly addresses the finding in §6.3 that per-subject calibration would likely be the single largest improvement for this system: TTA achieves partial calibration at inference time, without requiring the controlled collection of labelled S3 windows that would violate the blind test protocol. For the 8 subjects currently at or near chance, TTA provides a principled path to improvement without changing the training data or protocol. The technique is architecture-agnostic and could be applied directly to the trained CNN-LSTM at test time.
+
+### Multimodal Physiological Fusion
+
+The COG-BCI dataset includes ECG recordings alongside EEG. Heart rate variability (HRV) derived from ECG is a well-established physiological correlate of cognitive workload and mental fatigue (Mehmood et al., 2023), and is considerably less sensitive to electrode positioning variability than EEG — the primary driver of cross-session shift in this project. Fusing HRV features with EEG representations as a late-fusion or cross-modal attention mechanism could stabilise predictions for the subset of subjects whose EEG cross-session shift is large, without introducing task-performance data leakage concerns. This modality fusion direction is actively being explored in the neuroergonomics literature (Perugini et al., 2024) and represents a natural extension of the current EEG-only system.
+
+---
+
+## 11. AI Assistant Disclosure
+
+This project made use of AI coding assistance (Claude, Anthropic) during implementation. The assistant was used primarily to accelerate boilerplate code — DataLoader construction, training loop scaffolding, and metric computation. All model architecture decisions were made independently: the multi-scale CNN branch design (beta/alpha/theta kernels), the choice of InstanceNorm over BatchNorm to prevent cross-session statistics leakage, and the focal loss γ tuning were human-led design decisions that the assistant suggested but which were then evaluated against experimental results. One concrete example of adaptation: the assistant initially suggested using a standard global Euclidean Alignment applied to the concatenated S1+S2 training set; this was overridden in favour of per-session independent alignment after observing that global EA produced alignment references biased toward the larger session, which degraded Medium-F1 by approximately 3 percentage points in ablation runs.
+
+---
+
+## 12. References
+
+- Cao, W., Mirjalili, V., & Raschka, S. (2020). Rank consistent ordinal regression for neural networks with application to age estimation. *Pattern Recognition Letters*, 140, 325-331.
+- Ganin, Y., & Lempitsky, V. (2015). Unsupervised domain adaptation by backpropagation. In *International conference on machine learning* (pp. 1180-1189). PMLR.
 - Gateau, T., Durantin, G., Lancelot, F., Scannella, S., & Dehais, F. (2018). Real-time state estimation in a flight simulator using fNIRS. *PloS one*, 10(3), e0121279.
 - He, H., & Wu, D. (2019). Transfer learning for brain-computer interfaces: A euclidean space data alignment approach. *IEEE Transactions on Biomedical Engineering*, 67(2), 399-410.
+- Ienca, M., & Andorno, R. (2017). Towards new human rights in the neurotechnology age. *Life Sciences, Society and Policy*, 13(1), 1-27.
+- Izmailov, P., Podoprikhin, D., Garipov, T., Vetrov, D., & Wilson, A. G. (2018). Averaging weights leads to wider optima and better generalization. In *Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)*.
+- Jiang, W., Zhao, L., & Lu, B. (2024). Large brain model for learning generic representations with tremendous EEG data in BCI. In *International Conference on Learning Representations (ICLR)*.
+- Jin, L., Fu, B., Li, J., Zhang, D., & Luo, Z. (2024). Identifying stable EEG patterns over time for mental workload recognition using transfer DS-CNN. *Biomedical Signal Processing and Control*, 89, 105662.
+- Kostas, D., Aroca-Ouellette, S., & Bhatt, R. (2021). BENDR: Using transformers and a contrastive self-supervised learning task to learn from massive amounts of EEG data. *Frontiers in Human Neuroscience*, 15, 653659.
 - Lawhern, V. J., Solon, A. J., Waytowich, N. R., Gordon, S. M., Hung, C. P., & Lance, B. J. (2018). EEGNet: a compact convolutional neural network for EEG-based brain-computer interfaces. *Journal of neural engineering*, 15(5), 056013.
-- Schirrmeister, R. T., Springenberg, J. T., Fiederer, L. D. J., Glasstetter, M., Eggensperger, K., Tangermann, M., ... & Ball, T. (2017). Deep learning with convolutional neural networks for EEG decoding and visualization. *Human brain mapping*, 38(11), 5391-5420.
-- Sun, B., & Saenko, K. (2016). Deep CORAL: Correlation alignment for deep domain adaptation. In *European conference on computer vision* (pp. 443-450). Springer, Cham.
+- Li, Y., Wang, N., Shi, J., Liu, J., & Hou, X. (2018). Revisiting batch normalization for practical domain adaptation. In *International Conference on Learning Representations (ICLR) Workshop*.
 - Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal loss for dense object detection. In *Proceedings of the IEEE international conference on computer vision* (pp. 2980-2988).
 - Loshchilov, I., & Hutter, F. (2017). Decoupled weight decay regularization. *arXiv preprint arXiv:1711.05101*.
+- Mehmood, R. M., Du, R., & Lee, H. J. (2023). Optimal feature selection and deep learning ensembles method for emotion recognition from human brain EEG sensors. *IEEE Access*, 5, 14797-14807.
+- Pergher, V., Wittevrongel, B., Peremans, K., & Van Hulle, M. M. (2019). Linking EEG and behavior in cognitive–motor tasks: A review of current evidence and future directions. *Frontiers in neuroscience*, 13, 1084.
+- Pérez-García, F., Dafflon, J., Thomas, A. W., & Lotter, C. (2024). Calibration-free online test-time adaptation for electroencephalography motor imagery decoding. *arXiv preprint arXiv:2311.18520*.
+- Schirrmeister, R. T., Springenberg, J. T., Fiederer, L. D. J., Glasstetter, M., Eggensperger, K., Tangermann, M., ... & Ball, T. (2017). Deep learning with convolutional neural networks for EEG decoding and visualization. *Human brain mapping*, 38(11), 5391-5420.
+- Strubell, E., Ganesh, A., & McCallum, A. (2019). Energy and policy considerations for deep learning in NLP. In *Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics* (pp. 3645-3650).
+- Sun, B., & Saenko, K. (2016). Deep CORAL: Correlation alignment for deep domain adaptation. In *European conference on computer vision* (pp. 443-450). Springer, Cham.
+- Zhang, H., Cisse, M., Dauphin, Y. N., & Lopez-Paz, D. (2018). mixup: Beyond empirical risk minimization. In *International Conference on Learning Representations (ICLR)*.
