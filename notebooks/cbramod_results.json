@@ -1,0 +1,28 @@
+{
+  "model": "CBraMod (Wang et al., 2025, ICLR)",
+  "pretrained_from": "braindecode/cbramod-pretrained",
+  "pretrained_on": "Temple University Hospital EEG Corpus (TUEG)",
+  "params": 5296003,
+  "n_chans": 62,
+  "sfreq": 250,
+  "window_seconds": 8,
+  "n_times": 2000,
+  "train_windows": 3792,
+  "test_windows": 1753,
+  "probe_macro_f1": 0.5817263688426765,
+  "probe_per_class": [
+    0.8277915632754342,
+    0.4590542099192618,
+    0.4583333333333333
+  ],
+  "finetuned_acc": 0.6908157444381061,
+  "finetuned_macro_f1": 0.6247082096933728,
+  "finetuned_per_class": [
+    0.84,
+    0.5,
+    0.5341246290801187
+  ],
+  "baseline_cnn_lstm_macro_f1": 0.5768,
+  "delta": 0.04790820969337284,
+  "epochs_trained": 14
+}
