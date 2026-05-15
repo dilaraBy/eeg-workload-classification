@@ -1,5 +1,7 @@
 # EEG Mental Workload Classification
 
+> 📄 **Paper:** [Cross-Session EEG Mental Workload Classification (PDF)](Cross-Session%20EEG%20Mental%20Workload%20Classification.pdf) — full write-up of methodology, results, and discussion.
+
 Deep-learning pipeline for **cross-session 3-class mental workload classification** from EEG. Trained on the publicly available [COG-BCI MATB dataset](https://doi.org/10.1038/s41597-022-01898-y) (Gateau et al., 2018) — 29 subjects performing the Multi-Attribute Task Battery at Low / Medium / High workload across three sessions.
 
 The hard part is **cross-session generalisation**: train on sessions 1 + 2, test on session 3. EEG is highly non-stationary across sessions (electrode drift, impedance changes, cognitive adaptation), so this is a domain-shift problem on top of a classification problem.
@@ -12,7 +14,7 @@ The hard part is **cross-session generalisation**: train on sessions 1 + 2, test
 | EEGNet                      | 0.498      | 0.441      | 0.63   | 0.26      | 0.43    |
 | DeepConvNet                 | 0.533      | 0.523      | 0.62   | 0.44      | 0.52    |
 | **CNN-LSTM (best single)**  | **0.599**  | **0.577**  | 0.70   | 0.51      | 0.52    |
-| **Ensemble (DCN + LSTM)**   | 0.590      | **0.578**  | 0.68   | 0.50      | **0.56** |
+| **Ensemble (DCN + LSTM)**   | 0.590      | **0.578**  | 0.68   | 0.50      | **0.56**|
 
 Test set: 2,640 windows from session S3 (29 subjects × 3 difficulty levels).
 
