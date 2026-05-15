@@ -2,7 +2,7 @@
 
 > 📄 **Paper:** [Cross-Session EEG Mental Workload Classification (PDF)](Cross-Session%20EEG%20Mental%20Workload%20Classification.pdf) — full write-up of methodology, results, and discussion.
 
-Deep-learning pipeline for **cross-session 3-class mental workload classification** from EEG. Trained on the publicly available [COG-BCI MATB dataset](https://doi.org/10.1038/s41597-022-01898-y) (Gateau et al., 2018) — 29 subjects performing the Multi-Attribute Task Battery at Low / Medium / High workload across three sessions.
+Deep-learning pipeline for **cross-session 3-class mental workload classification** from EEG. Trained on the publicly available COG-BCI MATB dataset — 29 subjects performing the Multi-Attribute Task Battery at Low / Medium / High workload across three sessions.
 
 The hard part is **cross-session generalisation**: train on sessions 1 + 2, test on session 3. EEG is highly non-stationary across sessions (electrode drift, impedance changes, cognitive adaptation), so this is a domain-shift problem on top of a classification problem.
 
@@ -68,7 +68,6 @@ Then open `notebooks/eeg_workload_final.ipynb`. The notebook downloads and prepr
 
 ## Key references
 
-- COG-BCI MATB dataset — Gateau et al., *Scientific Data*, 2018
 - EEGNet — Lawhern et al., *J. Neural Eng.*, 2018
 - DeepConvNet — Schirrmeister et al., *Human Brain Mapping*, 2017
 - CBraMod — Wang et al., *ICLR*, 2025
